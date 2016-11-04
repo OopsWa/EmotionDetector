@@ -88,8 +88,8 @@ User.deletecodeByPhone = function (phone, callback) {
 };
 User.updatecodeByPhone = function (phone, callback) {
 
-    var update = 'update accept=\'1\' FROM register_code WHERE phone=?';
-    connection.query(select, [phone], function (err, rows) {
+    var update = 'update register_code accept=\'1\'  WHERE phone=?';
+    connection.query(update, [phone], function (err, rows) {
         if (err) {
             console.error('error select: ' + err.stack);
             return callback(err);
