@@ -1,5 +1,5 @@
 var config = {
-    port: 4000,
+    port: 3000,
     cookie: {
         cookieSecret: 'EmotionDetector',
         maxAge: 1000 * 60 * 60 * 24 * 30
