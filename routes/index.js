@@ -3,14 +3,70 @@ var router = express.Router();
 var crypto = require('crypto');
 var checkLogin = require('../passport/checkLogin');
 var myfun = require('../passport/myfun');
-var User = require('../models/user.model')
+var User = require('../models/user.model');
+var sms_config= require('../config/sms');
+var App = require('alidayu-node');
+var app = new App(sms_config.app_key, sms_config.app_secret);
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
-var routes = function (app) {
-  app.post('/login', checkLogin.checkNotLoginUserForm);
-  app.post('/login', function (req, res) {
+router.post('/send_sms', function(req, res){
+  console.log(123);
+  var phone = req.body.phone;
+    User.findUserByPhone(phone,function (err,rows) {
+       if(err)
+       {
+           return res.json({
+               "code":"3003",
+
+           });
+       }
+        if(rows.length>0)
+        {
+            return res.json({
+                "code":"3004",
+
+            });
+            var code = Math.random().toString().substr(2,6);
+            //console.log(sms_config);
+            app.smsSend({
+                sms_free_sign_name:sms_config.sms_free_sign_name, //!!!!!用sms_config会报错签名不合法
+                sms_param:{"code": code, "product":  'EmotionDetector'},
+                rec_num:phone,
+                sms_template_code: sms_config.sms_template_code
+            }, function( response){
+                if(!response) {
+                    console.log(response);
+                    console.log("11");
+                    return res.json({
+                        "code":"3003",
+
+                    });
+                }
+                if(response.error_response){
+                    console.log(response);
+                    return res.json({
+                        "code":"3002",
+
+                    });
+                }
+                console.log(response);
+                req.session.phone = phone;
+                req.session.code = code;
+                return res.json({
+                    "code":"3000"
+
+                });
+
+            });
+        }
+    });
+
+
+});
+  router.post('/login', checkLogin.checkNotLoginUserForm);
+router.post('/login', function (req, res) {
     var phone = req.body.phone;
     var password = req.body.password;
     if (!myfun.checkPhone(phone)) {
@@ -54,8 +110,8 @@ var routes = function (app) {
     });
   });
   // 注册操作
-  app.post('/register', checkLogin.checkNotLoginUserForm);
-  app.post('/register', function (req, res) {
+router.post('/register', checkLogin.checkNotLoginUserForm);
+router.post('/register', function (req, res) {
 
     var name = req.body.name;
     var phone = req.body.phone;
@@ -116,5 +172,5 @@ var routes = function (app) {
       });
     });
   });
-};
+
 module.exports = router;
