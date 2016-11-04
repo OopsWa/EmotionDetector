@@ -13,6 +13,7 @@ function User(phone, password,name,gender,birth) {
  User.prototype.insert = function (callback) {
    var time = parseInt(new Date().getTime() / 1000);
    var data = {
+       phone:this.phone,
        name: this.name,
        password: this.password,
        name: this.name,
@@ -20,7 +21,7 @@ function User(phone, password,name,gender,birth) {
        birth:this.birth,
        time: time
    };
-
+console.log(data);
    var insert = 'INSERT account SET ?';
    connection.query(insert,data, function (err, rows) {
      if (err) {
@@ -45,8 +46,58 @@ function User(phone, password,name,gender,birth) {
      callback(null, rows);
    });
  };
+User.reserveCode=function (phone,code,callback) {
+    var insert = 'INSERT register_code SET ?';
+    var data ={
+        phone:phone,
+        code:code,
+        time:parseInt(new Date().getTime() / 1000)
+    };
+    connection.query(insert,data, function (err, rows) {
+        if (err) {
+            console.error('error insert: ' + err.stack);
+            return callback(err);
+        }
+        callback(null, rows);
+    });
+};
 
+User.findcodeByPhone = function (phone, callback) {
 
+    var select = 'SELECT * FROM register_code WHERE phone=?';
+    connection.query(select, [phone], function (err, rows) {
+        if (err) {
+            console.error('error select: ' + err.stack);
+            return callback(err);
+        }
+
+        callback(null, rows);
+    });
+};
+User.deletecodeByPhone = function (phone, callback) {
+
+    var drop = 'delete FROM register_code WHERE phone=?';
+    connection.query(drop, [phone], function (err, rows) {
+        if (err) {
+            console.error('error select: ' + err.stack);
+            return callback(err);
+        }
+
+        callback(null, rows);
+    });
+};
+User.updatecodeByPhone = function (phone, callback) {
+
+    var update = 'update accept=\'1\' FROM register_code WHERE phone=?';
+    connection.query(select, [phone], function (err, rows) {
+        if (err) {
+            console.error('error select: ' + err.stack);
+            return callback(err);
+        }
+
+        callback(null, rows);
+    });
+};
 User.findUserById = function (user_id, callback) {
 
     var select = 'SELECT * FROM account WHERE id=?';
