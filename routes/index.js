@@ -275,5 +275,44 @@ router.post('/register', function (req, res) {
     });
     });
   });
+router.post('/saveData',checkLogin.checkLoginUserForm);
+router.post('/saveData',function(req, res){
+    var body = req.body;
 
+    var phone = req.session.user.phone;
+        data = body.data || '',
+        time = body.time || (new Date().getTime() / 1000);
+    if(phone == '' || data == ''){
+        return res.json({code:4000});
+    }
+    console.log('写入关键数据中...');
+    var newData = new Data(phone, data, time);
+    newData.insert(function(err, inserted){
+        if(err){
+            console.log('error newData.insert', err);
+            return res.json({code:4001});
+        }
+        console.log('suc newData.insert');
+        return res.json({code:4002});
+    });
+});
+
+router.post('/readData',checkLogin.checkLoginUserForm);
+router.post('/readData',function(req, res){
+    var body = req.body;
+    var phone = body.phone || '';
+    if(phone == ''){
+        return res.json({code:4000});
+    }
+    console.log('读取数据中...');
+    var readData = new Data(phone, null, null);
+    readData.read(function(err, result){
+        if(err){
+            console.log('读取数据失败 :'+err);
+            return res.json({code:4001});
+        }
+        console.log('读取数据成功');
+        return res.json(result);
+    })
+});
 module.exports = router;
