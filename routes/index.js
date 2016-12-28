@@ -279,14 +279,14 @@ router.post('/saveData',checkLogin.checkLoginUserForm);
 router.post('/saveData',function(req, res){
     var body = req.body;
 
-    var phone = req.session.user.phone;
-        data = body.data || '',
-        time = body.time || (new Date().getTime() / 1000);
-    if(phone == '' || data == ''){
+    var  user_id= req.session.user.id;
+    var   data = body.data || '';
+    var   time = body.time || (new Date().getTime() / 1000);
+    if(data == ''){
         return res.json({code:4000});
     }
     console.log('写入关键数据中...');
-    var newData = new Data(phone, data, time);
+    var newData = new Data(user_id, data, time);
     newData.insert(function(err, inserted){
         if(err){
             console.log('error newData.insert', err);
@@ -312,7 +312,10 @@ router.post('/readData',function(req, res){
             return res.json({code:4001});
         }
         console.log('读取数据成功');
-        return res.json(result);
+        res.render('index', {
+            result:result
+        });
+
     })
 });
 module.exports = router;

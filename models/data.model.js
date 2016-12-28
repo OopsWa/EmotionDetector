@@ -1,7 +1,7 @@
 var connection = require('./db.model');
 
-function Data(phone, data, time){
-    this.phone = phone;
+function Data(id, data, time){
+    this.user_id = id;
     this.data = data;
     this.time = time;
 }
@@ -10,7 +10,7 @@ function Data(phone, data, time){
 Data.prototype.insert = function(callback){
 	//var time = parseInt(new Date().getTiome()  / 1000);以客户端时间为准
 	var data = {
-		phone : this.phone,
+		user_id : this.user_id,
 		data : this.data,
 		time : this.time 
 	};
